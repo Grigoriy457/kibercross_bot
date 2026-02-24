@@ -1,0 +1,10 @@
+/config/.env
+/config/service-account.json
+/logs/
+
+/venv/
+/.idea/
+**/__pycache__/
+
+docker-compose.yml
+.dockerignore
