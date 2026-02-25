@@ -5,6 +5,8 @@ import constants.keyboard
 from dispatcher import logger
 import database
 
+from handlers.registration.final import final_message
+
 
 router = Router()
 
@@ -39,3 +41,4 @@ async def register__discipline_fifa(callback: types.CallbackQuery, state: FSMCon
         message_effect_id="5046509860389126442",  # 🎉
         reply_markup=constants.keyboard.main_keyboard
     )
+    await final_message(callback.message)

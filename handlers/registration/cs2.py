@@ -9,6 +9,8 @@ import constants.keyboard
 from dispatcher import logger
 import database
 
+from handlers.registration.final import final_message
+
 router = Router()
 
 
@@ -193,3 +195,4 @@ async def own_devices__handler(callback: types.CallbackQuery, state: FSMContext,
         message_effect_id="5046509860389126442",  # 🎉
         reply_markup=constants.keyboard.main_keyboard
     )
+    await final_message(callback.message)

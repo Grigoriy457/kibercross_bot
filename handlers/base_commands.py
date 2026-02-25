@@ -83,8 +83,18 @@ async def info(message: types.Message, state: FSMContext, db_session: database.A
     user = await db_session.merge(database.models.tg.TgUser(id=message.from_user.id, username=message.from_user.username))
     await db_session.commit()
 
-    text = 'Что? \n\n'
-    text += 'По всем вопросам по поводу мероприятия пиши <a href="https://t.me/sergkpt">Серёже</a>.'
+    text = '<tg-emoji emoji-id="5291849275783791207">🥶</tg-emoji> <i>Что такое киберкросс?</i>\n'\
+           ' — Киберкросс это фиджитал-турнир, на котором будут такие дисциплины, как: Counter-Strike 2, Dota 2 и EA FC, '\
+            'а второй этап в реальном мире: лазертаг, тактическая игра «Physical Dota» и мини-футбол соответственно!\n\n'\
+           '<tg-emoji emoji-id="5429451923344347143">🎮</tg-emoji> Турнир будет проходить с 9 по 22 марта. '\
+           'Дисциплины будут идти линейно, так что ты сможешь зарегистрироваться на все!\n\n'\
+           '<tg-emoji emoji-id="5415965335192883624">⚔️</tg-emoji> Скорее регистрируйся и создавай команды, чтобы победить и занять первое место!\n\n'\
+           'Ответственные за дисциплины:\n'\
+           'CS2 — <a href="t.me/XxxtooNN">Дима</a>\n'\
+           'Dota 2 — <a href="t.me/i1_yes">Ваня</a>\n'\
+           'EA FC — <a href="t.me/toster0">Егор</a>\n'\
+           'Им можно задать вопросы по дисциплинам.\n\n'\
+           'По всем остальным вопросам обращайся к <a href="t.me/sergkpt">Серёже</a> — главному организатору.'
 
     if (await user.awaitable_attrs.registration) is None:
         reply_markup = constants.keyboard.main_keyboard__with_registration
