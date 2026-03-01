@@ -113,7 +113,7 @@ async def registration__cancel__confirm(callback: types.CallbackQuery, state: FS
                         try:
                             await bot.send_message(
                                 chat_id=(await member.awaitable_attrs.registration).tg_user_id,
-                                text=f"❗️ Команда '{team.title}' была удалена, так как её владелец отменил регистрацию"
+                                text=f"❗️ Команда \"{team.title}\" была удалена, так как её владелец отменил регистрацию"
                             )
                         except aiogram.exceptions.TelegramBadRequest:
                             pass

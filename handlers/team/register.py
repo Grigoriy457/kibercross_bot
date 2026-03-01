@@ -27,7 +27,7 @@ async def my_team__register(callback: types.CallbackQuery, db_session: database.
     if db_registration is None:
         await callback.message.edit_text(
             "❌ У тебя ещё нет регистрации\n\n"
-            "Нажми на кнопку 'регистрация', чтобы начать её",
+            "Нажми на кнопку \"регистрация\", чтобы начать её",
             reply_markup=constants.keyboard.main_keyboard__with_registration
         )
         return
@@ -50,7 +50,7 @@ async def my_team__register(callback: types.CallbackQuery, db_session: database.
             "❌ У тебя уже есть команды во всех дисциплинах\n\n"
             "Покинь команду, чтобы создать новую",
             reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[
-                types.InlineKeyboardButton(text="◀️ Назад", callback_data="my_team")
+                types.InlineKeyboardButton(text="Назад", icon_custom_emoji_id="5960671702059848143", callback_data="my_team")
             ]])
         )
         return
@@ -63,7 +63,7 @@ async def my_team__register(callback: types.CallbackQuery, db_session: database.
                 types.InlineKeyboardButton(text="Dota 2", callback_data="my_team__register__discipline_dota2"),
                 types.InlineKeyboardButton(text="EA FC", callback_data="my_team__register__discipline_fifa")
             ],
-            [types.InlineKeyboardButton(text="◀️ Назад", callback_data="my_team")]
+            [types.InlineKeyboardButton(text="Назад", icon_custom_emoji_id="5960671702059848143", callback_data="my_team")]
         ])
     )
 
@@ -87,7 +87,7 @@ async def my_team__register__discipline(callback: types.CallbackQuery, state: FS
             "❌ У тебя уже есть команда в этой дисциплине\n\n"
             "Покинь команду, чтобы создать новую",
             reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[
-                types.InlineKeyboardButton(text="◀️ Назад", callback_data="my_team")
+                types.InlineKeyboardButton(text="Назад", icon_custom_emoji_id="5960671702059848143", callback_data="my_team")
             ]])
         )
         return
@@ -97,7 +97,7 @@ async def my_team__register__discipline(callback: types.CallbackQuery, state: FS
     await callback.message.edit_text(
         "Напиши название своей команды",
         reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[
-            types.InlineKeyboardButton(text="◀️ Назад", callback_data="my_team")
+            types.InlineKeyboardButton(text="Назад", icon_custom_emoji_id="5960671702059848143", callback_data="my_team")
         ]])
     )
 
@@ -113,7 +113,7 @@ async def my_team__register__team_title(message: types.Message, state: FSMContex
             "❌ Название команды слишком длинное (до 15 символов)\n"
             "Напиши название своей команды",
             reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[
-                types.InlineKeyboardButton(text="◀️ Назад", callback_data="my_team")
+                types.InlineKeyboardButton(text="Назад", icon_custom_emoji_id="5960671702059848143", callback_data="my_team")
             ]])
         )
         return
@@ -138,13 +138,14 @@ async def my_team__register__team_title(message: types.Message, state: FSMContex
 
     await state.clear()
     await message.answer(
-        f"✅ Команда '{team_title}' успешно создана!\n\n"
+        f"<tg-emoji emoji-id='5427009714745517609'>✅</tg-emoji> Команда \"{team_title}\" успешно создана!\n\n"
         "Пригласи своих друзей в команду, чтобы участвовать в турнире",
         reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[
-            types.InlineKeyboardButton(text="◀️ Назад", callback_data="my_team"),
+            types.InlineKeyboardButton(text="Назад", icon_custom_emoji_id="5960671702059848143", callback_data="my_team"),
             types.InlineKeyboardButton(
                 text="Пригласить",
-                switch_inline_query=f"приглашаю тебя в команду '{team_title}' по ссылке: t.me/cyberkross_2026_bot?start=team_{new_team.code}"
+                icon_custom_emoji_id = "5832251986635920010",
+                switch_inline_query=f"приглашаю тебя в команду \"{team_title}\" по ссылке: t.me/cyberkross_2026_bot?start=team_{new_team.code}"
             )
         ]])
     )

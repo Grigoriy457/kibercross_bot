@@ -61,9 +61,9 @@ class Registration(Base):
 
 
 class DisciplineEnum(enum.Enum):
-    CS2 = "cs2"
+    CS2 = "CS2"
     DOTA2 = "dota2"
-    FIFA = "fifa"
+    FIFA = "EA FC"
 
 
 class Team(Base):

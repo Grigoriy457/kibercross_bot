@@ -29,7 +29,7 @@ async def code_message_handler(message: types.Message, state: FSMContext, db_ses
     if db_registration is None:
         await message.answer(
             "❌ У тебя ещё нет регистрации\n\n"
-            "Нажми на кнопку 'регистрация', чтобы начать её",
+            "Нажми на кнопку \"регистрация\", чтобы начать её",
             reply_markup=constants.keyboard.main_keyboard__with_registration
         )
         return
@@ -38,7 +38,7 @@ async def code_message_handler(message: types.Message, state: FSMContext, db_ses
     if db_registration.__getattribute__(discipline_en) is False:
         await message.answer(
             f"❌ Ты не зарегистрирован на дисциплину {dict(constants.DISCIPLINES)[discipline_en]}\n\n"
-            f"Зарегистрируйся на {dict(constants.DISCIPLINES)[discipline_en]}, чтобы присоединиться к команде '{db_team.title}'",
+            f"Зарегистрируйся на {dict(constants.DISCIPLINES)[discipline_en]}, чтобы присоединиться к команде \"{db_team.title}\"",
             reply_markup=constants.keyboard.main_keyboard
         )
         return
@@ -53,13 +53,13 @@ async def code_message_handler(message: types.Message, state: FSMContext, db_ses
             "❌ Ты уже состоишь в команде этой дисциплины\n\n"
             "Покинь команду, чтобы присоединиться к этой",
             reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[
-                types.InlineKeyboardButton(text="◀️ Назад", callback_data="my_team")
+                types.InlineKeyboardButton(text="Назад", icon_custom_emoji_id="5960671702059848143", callback_data="my_team")
             ]])
         )
         return
 
     if len(await db_team.awaitable_attrs.team_members) >= 5:
-        await message.answer("❌ В команде уже 5 участников")
+        await message.answer("❌ В команде уже 5 участников", reply_markup=constants.keyboard.main_keyboard)
         return
 
     new_team_membership = database.models.registration.TeamMembers(
@@ -70,12 +70,13 @@ async def code_message_handler(message: types.Message, state: FSMContext, db_ses
     await db_session.commit()
 
     await message.answer(
-        f"✅ Ты успешно присоединился к команде '{db_team.title}'!\n\n"
-        "Теперь ты можешь увидеть её в разделе 'моя команда'",
+        f"<tg-emoji emoji-id='5427009714745517609'>✅</tg-emoji> Ты успешно присоединился к команде '{db_team.title}'!\n\n"
+        "Теперь ты можешь увидеть её в разделе \"моя команда\"",
         message_effect_id="5046509860389126442",  # 🎉
         reply_markup=constants.keyboard.main_keyboard
     )
     await bot.send_message(
         chat_id=await (await db_team.awaitable_attrs.owner_registration).awaitable_attrs.tg_user_id,
-        text=f"👤 {db_registration.full_name} ({db_registration.nickname}) присоединился к твоей команде '{db_team.title}'!"
+        text=f"<tg-emoji emoji-id='5373012449597335010'>👤</tg-emoji> {db_registration.full_name} ({db_registration.nickname}) "
+             f"присоединился к твоей команде \"{db_team.title}\" ({db_team.discipline.value})!"
     )

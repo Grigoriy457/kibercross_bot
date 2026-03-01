@@ -44,7 +44,7 @@ async def steam_id__handler(message: Union[types.Message, types.CallbackQuery], 
     else:
         await message.delete()
         steam_id = message.text
-        if (ret := re.match(r"^https?://steamcommunity\.com/(id|profiles)/([a-zA-Z0-9_]+)/?$", steam_id)) is None:
+        if (ret := re.match(r"^https?://steamcommunity\.com/(id|profiles)/([a-zA-Z0-9_-]+)/?$", steam_id)) is None:
             await bot.edit_message_text(
                 "<b>❌ Ошибка</b>\n\n"
                 "Пришли ссылку на свой профиль в Steam (например, https://steamcommunity.com/id/username или https://steamcommunity.com/profiles/12345678901234567)",
@@ -109,7 +109,7 @@ async def own_devices__handler(callback: types.CallbackQuery, state: FSMContext,
     if db_registration is None:
         await callback.message.edit_text(
             "❌ Ошибка\n\n"
-            "Пожалуйста, начни регистрацию заново, нажав на кнопку 'регистрация'",
+            "Пожалуйста, начни регистрацию заново, нажав на кнопку \"регистрация\"",
             reply_markup=constants.keyboard.main_keyboard__with_registration
         )
         return
@@ -123,7 +123,7 @@ async def own_devices__handler(callback: types.CallbackQuery, state: FSMContext,
     await callback.message.answer(
         "✅ Отлично!\n"
         "Теперь ты зарегистрирован на дисциплину Dota 2\n\n"
-        "<i>Для регистрации на другие дисциплины нажми на кнопку 'моя регистрация' и добавь её</i>",
+        "<i>Для регистрации на другие дисциплины нажми на кнопку \"моя регистрация\" и добавь её</i>",
         message_effect_id="5046509860389126442",  # 🎉
         reply_markup=constants.keyboard.main_keyboard
     )

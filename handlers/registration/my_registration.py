@@ -32,7 +32,7 @@ async def my_registration__handler(message: Union[types.Message, types.CallbackQ
     if db_registration is None:
         await message.answer(
             "❌ У тебя ещё нет регистрации\n\n"
-            "Нажми на кнопку 'регистрация', чтобы начать её",
+            "Нажми на кнопку \"регистрация\", чтобы начать её",
             reply_markup=constants.keyboard.main_keyboard__with_registration
         )
         return

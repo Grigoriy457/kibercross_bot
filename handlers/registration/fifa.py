@@ -25,7 +25,7 @@ async def register__discipline_fifa(callback: types.CallbackQuery, state: FSMCon
     if db_registration is None:
         await callback.message.edit_text(
             "❌ Ошибка\n\n"
-            "Пожалуйста, начни регистрацию заново, нажав на кнопку 'регистрация'",
+            "Пожалуйста, начни регистрацию заново, нажав на кнопку \"регистрация\"",
             reply_markup=constants.keyboard.main_keyboard__with_registration
         )
         return
@@ -37,7 +37,7 @@ async def register__discipline_fifa(callback: types.CallbackQuery, state: FSMCon
     await callback.message.answer(
         "✅ Отлично!\n"
         "Теперь ты зарегистрирован на дисциплину EA FC\n\n"
-        "<i>Для регистрации на другие дисциплины нажми на кнопку 'моя регистрация' и добавь её</i>",
+        "<i>Для регистрации на другие дисциплины нажми на кнопку \"моя регистрация\" и добавь её</i>",
         message_effect_id="5046509860389126442",  # 🎉
         reply_markup=constants.keyboard.main_keyboard
     )

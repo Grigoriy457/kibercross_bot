@@ -7,11 +7,13 @@ import constants.keyboard
 from dispatcher import logger
 import database
 
-from handlers.team import register as team_register, join as team_join
+from handlers.team import register as team_register, join as team_join, exit as team_exit, share as team_share
 
 
 router = Router()
 router.include_router(team_register.router)
+router.include_router(team_exit.router)
+router.include_router(team_share.router)
 
 
 @router.message(F.text == constants.keyboard.keyboard__buttons["my_team"])
@@ -32,7 +34,7 @@ async def my_team__handler(message: Union[types.Message, types.CallbackQuery], s
     if db_registration is None:
         await message.answer(
             "❌ У тебя ещё нет регистрации\n\n"
-            "Нажми на кнопку 'регистрация', чтобы начать её",
+            "Нажми на кнопку \"регистрация\", чтобы начать её",
             reply_markup=constants.keyboard.main_keyboard__with_registration
         )
         return
@@ -48,7 +50,7 @@ async def my_team__handler(message: Union[types.Message, types.CallbackQuery], s
         team = next(team for team in teams if team.discipline == discipline_enum)
         team_members = [
             await team_membership.awaitable_attrs.registration
-            for team_membership in (await team.awaitable_attrs.team_members)
+            for team_membership in sorted((await team.awaitable_attrs.team_members), key=lambda t: t.created_at)
         ]
         text = "<blockquote>"
         for member_registration in team_members:
@@ -56,33 +58,33 @@ async def my_team__handler(message: Union[types.Message, types.CallbackQuery], s
         text += "</blockquote>\n"
         return text
 
-    text = "👥 Твои команды:\n\n"
-    text += "Counter-Strike 2"
+    text = "<tg-emoji emoji-id='5370867268051806190'>🫂</tg-emoji> Твои команды:\n\n"
+    text += "<b>Counter-Strike 2</b>"
     if database.models.registration.DisciplineEnum.CS2 not in teams_disciplines:
-        text += " — ❌\n"
+        text += " — <tg-emoji emoji-id='5980953710157632545'>❌</tg-emoji>\n"
     else:
-        text += f" — ✅ {next(team.title for team in teams if team.discipline == database.models.registration.DisciplineEnum.CS2)}\n"
+        text += f" — {next(team.title for team in teams if team.discipline == database.models.registration.DisciplineEnum.CS2)}:\n"
         text += await format_team_text(database.models.registration.DisciplineEnum.CS2)
-    text += "Dota 2"
+    text += "<b>Dota 2</b>"
     if database.models.registration.DisciplineEnum.DOTA2 not in teams_disciplines:
-        text += " — ❌\n"
+        text += " — <tg-emoji emoji-id='5980953710157632545'>❌</tg-emoji>\n"
     else:
-        text += f" — ✅ {next(team.title for team in teams if team.discipline == database.models.registration.DisciplineEnum.DOTA2)}\n"
+        text += f" — {next(team.title for team in teams if team.discipline == database.models.registration.DisciplineEnum.DOTA2)}:\n"
         text += await format_team_text(database.models.registration.DisciplineEnum.DOTA2)
-    text += "EA FC"
+    text += "<b>EA FC</b>"
     if database.models.registration.DisciplineEnum.FIFA not in teams_disciplines:
-        text += " — ❌\n"
+        text += " — <tg-emoji emoji-id='5980953710157632545'>❌</tg-emoji>\n"
     else:
-        text += f" — ✅ {next(team.title for team in teams if team.discipline == database.models.registration.DisciplineEnum.FIFA)}\n"
+        text += f" — {next(team.title for team in teams if team.discipline == database.models.registration.DisciplineEnum.FIFA)}:\n"
         text += await format_team_text(database.models.registration.DisciplineEnum.FIFA)
 
     await message.answer(
         text,
         reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text="➕ Пригласить", callback_data="main_menu")],
+            [types.InlineKeyboardButton(text="Пригласить", icon_custom_emoji_id="5832251986635920010", callback_data="my_team__share")],
             [
-                types.InlineKeyboardButton(text="⚔️ Создать команду", callback_data="my_team__register"),
-                types.InlineKeyboardButton(text="❌ Покинуть команду", callback_data="my_team__exit")
+                types.InlineKeyboardButton(text="Создать команду", icon_custom_emoji_id="5415965335192883624", callback_data="my_team__register"),
+                types.InlineKeyboardButton(text="Покинуть команду", icon_custom_emoji_id="5978859389614821335", callback_data="my_team__exit")
             ]
         ])
     )
