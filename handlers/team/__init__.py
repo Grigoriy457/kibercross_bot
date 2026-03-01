@@ -78,10 +78,14 @@ async def my_team__handler(message: Union[types.Message, types.CallbackQuery], s
         text += f" — {next(team.title for team in teams if team.discipline == database.models.registration.DisciplineEnum.FIFA)}:\n"
         text += await format_team_text(database.models.registration.DisciplineEnum.FIFA)
 
+    buttons = []
+    if len(teams) > 0:
+        buttons.append([
+            types.InlineKeyboardButton(text="Пригласить", icon_custom_emoji_id="5832251986635920010", callback_data="my_team__share")
+        ])
     await message.answer(
         text,
-        reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[
-            [types.InlineKeyboardButton(text="Пригласить", icon_custom_emoji_id="5832251986635920010", callback_data="my_team__share")],
+        reply_markup=types.InlineKeyboardMarkup(inline_keyboard=buttons + [
             [
                 types.InlineKeyboardButton(text="Создать команду", icon_custom_emoji_id="5415965335192883624", callback_data="my_team__register"),
                 types.InlineKeyboardButton(text="Покинуть команду", icon_custom_emoji_id="5978859389614821335", callback_data="my_team__exit")
