@@ -70,7 +70,7 @@ async def my_team__register(callback: types.CallbackQuery, db_session: database.
 
 @router.callback_query(F.data.startswith("my_team__register__discipline_"))
 async def my_team__register__discipline(callback: types.CallbackQuery, state: FSMContext, db_session: database.AsyncSession):
-    discipline = callback.data.split("__")[-1].split("_")[-1]
+    discipline = callback.data.split("__")[-1].split("_")[-1].upper()
 
     db_registration = await db_session.scalar(
         database.select(database.models.registration.Registration)
@@ -80,7 +80,7 @@ async def my_team__register__discipline(callback: types.CallbackQuery, state: FS
         database.select(database.models.registration.TeamMembers)
         .join(database.models.registration.Team)
         .where(database.models.registration.TeamMembers.registration_id == db_registration.id)
-        .where(database.models.registration.Team.discipline == database.models.registration.DisciplineEnum(discipline))
+        .where(database.models.registration.Team.discipline == database.models.registration.DisciplineEnum[discipline])
     )
     if team is not None:
         await callback.message.edit_text(
@@ -125,7 +125,7 @@ async def my_team__register__team_title(message: types.Message, state: FSMContex
     new_team = database.models.registration.Team(
         code=''.join(random.choices(string.ascii_letters, k=10)),
         title=team_title,
-        discipline=database.models.registration.DisciplineEnum(discipline),
+        discipline=database.models.registration.DisciplineEnum[discipline],
         owner_registration_id=db_registration.id
     )
     db_session.add(new_team)
