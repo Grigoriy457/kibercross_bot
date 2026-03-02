@@ -34,7 +34,7 @@ async def code_message_handler(message: types.Message, state: FSMContext, db_ses
         )
         return
 
-    discipline_en = f"discipline_{db_team.discipline.value}"
+    discipline_en = f"discipline_{db_team.discipline.name.lower()}"
     if db_registration.__getattribute__(discipline_en) is False:
         await message.answer(
             f"❌ Ты не зарегистрирован на дисциплину {dict(constants.DISCIPLINES)[discipline_en]}\n\n"
