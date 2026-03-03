@@ -336,6 +336,10 @@ async def education_group__handler(message: Union[types.Message, types.CallbackQ
 async def after_education_group__handler(callback: types.CallbackQuery, state: FSMContext):
     logger.info(f"[HANDLER] After bmstu education (id={callback.from_user.id})")
 
+    await state.clear()
+    await callback.message.edit_text('😭 К сожалению, регистрация для студентов других ВУЗов уже закрыта')
+    return
+
     await state.update_data(bmstu_education=False, passport_data=None)
 
     new_message = await callback.message.answer(
