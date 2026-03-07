@@ -1,6 +1,7 @@
 from aiogram import types, Router, Bot, F
 from aiogram.filters import CommandStart, Command, CommandObject
 from aiogram.fsm.context import FSMContext
+import sqlalchemy
 
 from dispatcher import logger
 import constants
@@ -129,3 +130,63 @@ async def id_handler(message: types.Message, state: FSMContext, db_session: data
     await db_session.commit()
 
     await message.answer(f"Твой id: <code>{message.from_user.id}</code>")
+
+
+@router.message(Command("stats"), F.chat.id == config.ADMIN_CHAT_ID)
+async def stats_handler(message: types.Message, state: FSMContext, db_session: database.AsyncSession):
+    logger.info(f"[HANDLER] Stats command (id={message.from_user.id})")
+    await state.clear()
+
+    registrations_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
+    )
+    registration_with_disciplines_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
+        .where(
+            sqlalchemy.or_(
+                database.models.registration.Registration.discipline_cs2 == True,
+                database.models.registration.Registration.discipline_dota2 == True,
+                database.models.registration.Registration.discipline_fifa == True
+            )
+        )
+    )
+    registrations_cs2_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
+        .where(database.models.registration.Registration.discipline_fifa == True)
+    )
+    registrations_dota2_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
+        .where(database.models.registration.Registration.discipline_fifa == True)
+    )
+    registrations_fifa_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
+        .where(database.models.registration.Registration.discipline_fifa == True)
+    )
+
+    teams_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Team)
+    )
+    teams_cs2_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Team)
+        .where(database.models.registration.Team.discipline == database.models.registration.DisciplineEnum.CS2)
+    )
+    teams_dota2_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Team)
+        .where(database.models.registration.Team.discipline == database.models.registration.DisciplineEnum.DOTA2)
+    )
+    teams_fifa_count = await db_session.scalar(
+        sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Team)
+        .where(database.models.registration.Team.discipline == database.models.registration.DisciplineEnum.FIFA)
+    )
+
+    await message.answer(
+        f"<tg-emoji emoji-id='5231200819986047254'>📊</tg-emoji> Всего регистраций: <code>{registrations_count}</code>\n\n"
+        f"<tg-emoji emoji-id='5229011542011299168'>👑</tg-emoji> <b>Регистраций с выбранной дисциплиной:</b> <code>{registration_with_disciplines_count}</code>\n"
+        f"<tg-emoji emoji-id='5431628883352895287'>🎮</tg-emoji> CS2 — <code>{registrations_cs2_count}</code>\n"
+        f"<tg-emoji emoji-id='5404333301034927124'>🎮</tg-emoji> DOTA 2 — <code>{registrations_dota2_count}</code>\n"
+        f"<tg-emoji emoji-id='5431699131837985981'>🎮</tg-emoji> FIFA — <code>{registrations_fifa_count}</code>\n\n"
+        f"<tg-emoji emoji-id='5325547803936572038'>✨</tg-emoji> <b>Количество команд:</b> <code>{teams_count}</code>\n"
+        f"<tg-emoji emoji-id='5431628883352895287'>🎮</tg-emoji> CS2 — <code>{teams_cs2_count}</code>\n"
+        f"<tg-emoji emoji-id='5404333301034927124'>🎮</tg-emoji> DOTA 2 — <code>{teams_dota2_count}</code>\n"
+        f"<tg-emoji emoji-id='5431699131837985981'>🎮</tg-emoji> FIFA — <code>{teams_fifa_count}</code>\n\n"
+    )

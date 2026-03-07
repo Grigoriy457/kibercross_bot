@@ -69,8 +69,36 @@ async def finish_registration():
                 await asyncio.sleep(1 / 30)
 
 
+async def less_than_five_in_team():
+    async with database.Database() as db:
+        async with db.session() as session:
+            teams = (await session.scalars(
+                database.select(database.models.registration.Team)
+                .where(sqlalchemy.func.array_length(
+                    database.select(database.models.registration.TeamMembers)
+                    .where(database.models.registration.TeamMembers.team_id == database.models.registration.Team.id)
+                    .correlate(database.models.registration.Team),
+                    1
+                ) < 5)
+            )).all()
+            k = len(teams)
+            for i, team in enumerate(teams):
+                print(f"{i + 1}/{k} - {team.title} ({team.discipline})")
+                owner_registration = await team.awaitable_attrs.owner_registration
+                try:
+                    await bot.send_message(
+                        await owner_registration.awaitable_attrs.tg_user_id,
+                        "<tg-emoji emoji-id='5472055112702629499'>👋</tg-emoji> Привет! "
+                        f"Увидели, что в твоей команде \"{team.title}\" по дисциплине {dict(constants.DISCIPLINES)[f'discipline_{team.discipline.name.lower()}']} меньше 5 участников\n\n"
+                        "Постарайтесь набрать хотя бы 5 участников, чтобы быть более конкурентоспособными на турнире!\n\n",
+                    )
+                except Exception as e:
+                    print(f"Error for {owner_registration.tg_user_id}: {e}")
+                await asyncio.sleep(1 / 30)
+
+
 if __name__ == "__main__":
     import asyncio
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(finish_registration())
+    # loop.run_until_complete(finish_registration())
