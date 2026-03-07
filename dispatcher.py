@@ -66,13 +66,16 @@ class PrivacyPolicyCheckerMiddleware(BaseMiddleware):
         if user_id == bot.id:
             return await handler(event, data)
 
+        message = (event.message or event.callback_query.message)
+        if message.from_user.chat.type != "private":
+            return None
+
         db_session: database.AsyncSession = data["db_session"]
         tg_user = await db_session.scalar(
             database.select(database.models.tg.TgUser)
             .where(database.models.tg.TgUser.id == user_id)
         )
         if (tg_user is None) or (not tg_user.is_policy_confirmed):
-            message = (event.message or event.callback_query.message)
             await message.answer(
                 '<b>👋 Добро пожаловать на регистрацию «Фиджитал-турнира: Киберкросс»!</b>\n\n'
                 '<i>Перед началом регистрации просим подтвердить, что ты даёшь согласие на обработку персональных данных в соответствии с Федеральным законом «О персональных данных» от 27.07.2006 N 152-ФЗ.</i>',
@@ -80,7 +83,7 @@ class PrivacyPolicyCheckerMiddleware(BaseMiddleware):
                     types.InlineKeyboardButton(text="✅ Подтверждаю", callback_data="start__confirm_privacy")
                 ]])
             )
-            return
+            return None
         return await handler(event, data)
 
 
