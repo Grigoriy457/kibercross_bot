@@ -152,11 +152,11 @@ async def stats_handler(message: types.Message, state: FSMContext, db_session: d
     )
     registrations_cs2_count = await db_session.scalar(
         sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
-        .where(database.models.registration.Registration.discipline_fifa == True)
+        .where(database.models.registration.Registration.discipline_cs2 == True)
     )
     registrations_dota2_count = await db_session.scalar(
         sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
-        .where(database.models.registration.Registration.discipline_fifa == True)
+        .where(database.models.registration.Registration.discipline_dota2 == True)
     )
     registrations_fifa_count = await db_session.scalar(
         sqlalchemy.select(sqlalchemy.func.count()).select_from(database.models.registration.Registration)
