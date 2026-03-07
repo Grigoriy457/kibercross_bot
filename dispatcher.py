@@ -68,7 +68,7 @@ class PrivacyPolicyCheckerMiddleware(BaseMiddleware):
 
         message = (event.message or event.callback_query.message)
         if message.chat.type != "private":
-            if message.text == "/stats" and message.chat.id == config.ADMIN_CHAT_ID:
+            if message.text.startswith("/stats") and message.chat.id == config.ADMIN_CHAT_ID:
                 return await handler(event, data)
             return None
 
