@@ -67,7 +67,9 @@ class PrivacyPolicyCheckerMiddleware(BaseMiddleware):
             return await handler(event, data)
 
         message = (event.message or event.callback_query.message)
-        if message.from_user.chat.type != "private":
+        if message.chat.type != "private":
+            if message.text == "/stats" and message.chat.id == config.ADMIN_CHAT_ID:
+                return await handler(event, data)
             return None
 
         db_session: database.AsyncSession = data["db_session"]
