@@ -2,7 +2,7 @@ from aiogram import types, Router, F
 
 from constants.keyboard import main_keyboard, main_keyboard__with_registration, admin_keyboard
 from handlers import forms
-from handlers import base_commands, registration, team
+from handlers import base_commands, registration, team, for_sender
 import database
 import config
 
@@ -12,6 +12,7 @@ router.include_routers(
     base_commands.router,
     registration.router,
     team.router,
+    for_sender.router
 )
 
 

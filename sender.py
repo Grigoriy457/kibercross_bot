@@ -1,4 +1,7 @@
+import datetime
+
 import sqlalchemy
+from aiogram import types
 
 import constants.keyboard
 import database
@@ -74,12 +77,12 @@ async def less_than_five_in_team():
         async with db.session() as session:
             teams = (await session.scalars(
                 database.select(database.models.registration.Team)
-                .where(sqlalchemy.func.array_length(
-                    database.select(database.models.registration.TeamMembers)
+                .where(
+                    sqlalchemy.select(sqlalchemy.func.count())
+                    .select_from(database.models.registration.TeamMembers)
                     .where(database.models.registration.TeamMembers.team_id == database.models.registration.Team.id)
-                    .correlate(database.models.registration.Team),
-                    1
-                ) < 5)
+                    .correlate(database.models.registration.Team).as_scalar()
+                 < 5)
             )).all()
             k = len(teams)
             for i, team in enumerate(teams):
@@ -89,8 +92,55 @@ async def less_than_five_in_team():
                     await bot.send_message(
                         await owner_registration.awaitable_attrs.tg_user_id,
                         "<tg-emoji emoji-id='5472055112702629499'>👋</tg-emoji> Привет! "
-                        f"Увидели, что в твоей команде \"{team.title}\" по дисциплине {dict(constants.DISCIPLINES)[f'discipline_{team.discipline.name.lower()}']} меньше 5 участников\n\n"
-                        "Постарайтесь набрать хотя бы 5 участников, чтобы быть более конкурентоспособными на турнире!\n\n",
+                        f"Увидели, что в твоей команде \"{team.title}\" по дисциплине {dict(constants.DISCIPLINES)[f'discipline_{team.discipline.name.lower()}']} меньше 5 участников.\n\n"
+                        "Постарайтесь набрать 5 участников или организаторам придётся вас объединить с другой командой!\n\n",
+                    )
+                except Exception as e:
+                    print(f"Error for {owner_registration.tg_user_id}: {e}")
+                await asyncio.sleep(1 / 30)
+
+
+async def select_preferred_date_in_team():
+    dates = {
+        database.models.registration.DisciplineEnum.CS2: [
+            datetime.date(2026, 3, 19), datetime.date(2026, 3, 20)
+        ],
+        database.models.registration.DisciplineEnum.DOTA2: [
+            datetime.date(2026, 3, 16), datetime.date(2026, 3, 17)
+        ],
+        database.models.registration.DisciplineEnum.FIFA: [
+            datetime.date(2026, 3, 11), datetime.date(2026, 3, 13)
+        ],
+    }
+    async with database.Database() as db:
+        async with db.session() as session:
+            teams = (await session.scalars(
+                database.select(database.models.registration.Team)
+                .where(database.models.registration.Team.preferred_dates == None)
+            )).all()
+            k = len(teams)
+            for i, team in enumerate(teams):
+                print(f"{i + 1}/{k} - {team.title} ({team.discipline})")
+                owner_registration = await team.awaitable_attrs.owner_registration
+                try:
+                    buttons = [
+                        types.InlineKeyboardButton(
+                            text=date.strftime("%d.%m.%Y"),
+                            callback_data=f"for_sender__select_date__{team.id}__{date.isoformat()}"
+                        )
+                        for date in dates[team.discipline]
+                    ] + [
+                        types.InlineKeyboardButton(
+                            text="Любая",
+                            callback_data=f"for_sender__select_date__{team.id}__any"
+                        )
+                    ]
+                    await bot.send_message(
+                        await owner_registration.awaitable_attrs.tg_user_id,
+                        "<tg-emoji emoji-id='5472055112702629499'>👋</tg-emoji> Привет! "
+                        f"Турнир уже совсем скоро, поэтому выбери предпочитаемую дату, в которую твоя команда \"{team.title}\" по дисциплине {dict(constants.DISCIPLINES)[f'discipline_{team.discipline.name.lower()}']} может играть. "
+                        f"Если можете в любую дату, то выбери соответствующий вариант.",
+                        reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[buttons])
                     )
                 except Exception as e:
                     print(f"Error for {owner_registration.tg_user_id}: {e}")
@@ -101,4 +151,4 @@ if __name__ == "__main__":
     import asyncio
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    # loop.run_until_complete(finish_registration())
+    loop.run_until_complete(select_preferred_date_in_team())

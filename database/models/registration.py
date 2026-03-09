@@ -78,13 +78,14 @@ class Team(Base):
     is_approved: Mapped[bool] = Column(Boolean, nullable=False, default=0)
     approved_datetime: Mapped[Optional[datetime.datetime]] = Column(DateTime, nullable=True)
     approved_by_admin_tg_user_id: Mapped[Optional[int]] = Column(BIGINT, ForeignKey("admin.tg_user_id", ondelete='SET NULL'))
+    preferred_dates: Mapped[str] = Column(String(50), nullable=True)
 
     owner_registration: Mapped["Registration"] = relationship("Registration")
     members: Mapped[List["TeamMembers"]] = relationship("TeamMembers", back_populates="team", cascade="all, delete-orphan", viewonly=True)
     approved_by_admin: Mapped["Admin"] = relationship("Admin")
 
     def __repr__(self):
-        return f"<Team: id={self.id}, code='{self.code}', name='{self.name}' owner_tg_user_id={self.owner_tg_user_id}, is_approved={self.is_approved}>"
+        return f"<Team: id={self.id}, code='{self.code}', name='{self.title}' owner_tg_user_id={self.owner_registration_id}, is_approved={self.is_approved}>"
 
 
 class TeamMembers(Base):
