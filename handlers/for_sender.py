@@ -60,7 +60,7 @@ async def for_sender__is_going_to_open(callback: types.CallbackQuery, db_session
     db_registration: database.models.registration.Registration = await db_tg_user.awaitable_attrs.registration
 
     if answer == "yes":
-        text = "Отлично! Ждем тебя на открытии турнира!"
+        text = "Отлично! Ждем тебя на открытии турнира с 14:00 до 17:00 в аудитории 417к!"
         db_registration.is_going_to_open = True
     else:
         text = "Жаль, что ты не сможешь прийти на открытие. Но мы все равно ждем тебя на турнире!"
