@@ -49,6 +49,7 @@ class Registration(Base):
     discipline_dota2: Mapped[bool] = Column(Boolean, nullable=False, default=0)
     discipline_fifa: Mapped[bool] = Column(Boolean, nullable=False, default=0)
 
+    is_going_to_open: Mapped[bool] = Column(Boolean, nullable=True, default=None)
     is_registered: Mapped[bool] = Column(Boolean, nullable=False, default=0)
     is_confirmed: Mapped[bool] = Column(Boolean, nullable=False, default=0)
     is_banned: Mapped[bool] = Column(Boolean, nullable=False, default=0)

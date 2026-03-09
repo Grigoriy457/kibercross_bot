@@ -147,8 +147,68 @@ async def select_preferred_date_in_team():
                 await asyncio.sleep(1 / 30)
 
 
+async def not_in_team():
+    async with database.Database() as db:
+        async with db.session() as session:
+            registrations = (await session.scalars(
+                database.select(database.models.registration.Registration)
+                .outerjoin(
+                    database.models.registration.TeamMembers,
+                    database.models.registration.TeamMembers.registration_id == database.models.registration.Registration.id
+                )
+                .where(sqlalchemy.or_(
+                    database.models.registration.Registration.discipline_cs2 == True,
+                    database.models.registration.Registration.discipline_dota2 == True,
+                    database.models.registration.Registration.discipline_fifa == True
+                ))
+                .where(database.models.registration.TeamMembers.registration_id.is_(None))
+            )).all()
+            k = len(registrations)
+            for i, registration in enumerate(registrations):
+                print(f"{i + 1}/{k} - {registration.id} ({registration.full_name}, {registration.tg_user_id})")
+                try:
+                    await bot.send_message(
+                        registration.tg_user_id,
+                        "<tg-emoji emoji-id='5472055112702629499'>👋</tg-emoji> Привет! "
+                        "Напоминаем, что турнир скоро начнётся, поэтому находи скорее себе команду и регистрируйте её.",
+                    )
+                except Exception as e:
+                    print(f"Error for {registration.tg_user_id}: {e}")
+                await asyncio.sleep(1 / 30)
+
+
+async def is_going_to_open():
+    async with database.Database() as db:
+        async with db.session() as session:
+            registrations = (await session.scalars(
+                database.select(database.models.registration.Registration)
+                .where(database.models.registration.Registration.is_going_to_open == None)
+            )).all()
+            k = len(registrations)
+            for i, registration in enumerate(registrations):
+                print(f"{i + 1}/{k} - {registration.id} ({registration.full_name}, {registration.tg_user_id})")
+                try:
+                    await bot.send_message(
+                        registration.tg_user_id,
+                        "Уже завтра будет открытие турнира в аудитории 417к с 14:00 до 17:00. Ты планируешь прийти?",
+                        reply_markup=types.InlineKeyboardMarkup(inline_keyboard=[[
+                            types.InlineKeyboardButton(
+                                text="Да, приду",
+                                callback_data=f"for_sender__is_going_to_open__yes"
+                            ),
+                            types.InlineKeyboardButton(
+                                text="Нет, не приду",
+                                callback_data=f"for_sender__is_going_to_open__no"
+                            )
+                        ]])
+                    )
+                except Exception as e:
+                    print(f"Error for {registration.tg_user_id}: {e}")
+                await asyncio.sleep(1 / 30)
+
+
 if __name__ == "__main__":
     import asyncio
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(select_preferred_date_in_team())
+    loop.run_until_complete(is_going_to_open())

@@ -50,3 +50,22 @@ async def for_sender__select_date(callback: types.CallbackQuery, db_session: dat
         f"Дата: {date}\n\n"
         f"<i>Жди дальнейшую информацию от организаторов турнира.</i>"
     )
+
+
+@router.callback_query(F.data.startswith("for_sender__is_going_to_open__"))
+async def for_sender__is_going_to_open(callback: types.CallbackQuery, db_session: database.AsyncSession):
+    _, _, answer = callback.data.split("__")
+
+    db_tg_user = await db_session.get(database.models.tg.TgUser, callback.from_user.id)
+    db_registration: database.models.registration.Registration = await db_tg_user.awaitable_attrs.registration
+
+    if answer == "yes":
+        text = "Отлично! Ждем тебя на открытии турнира!"
+        db_registration.is_going_to_open = True
+    else:
+        text = "Жаль, что ты не сможешь прийти на открытие. Но мы все равно ждем тебя на турнире!"
+        db_registration.is_going_to_open = False
+    await db_session.merge(db_registration)
+    await db_session.commit()
+
+    await callback.message.edit_text(text)
