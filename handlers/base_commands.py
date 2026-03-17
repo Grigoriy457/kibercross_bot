@@ -189,8 +189,6 @@ async def stats_handler(message: types.Message, state: FSMContext, db_session: d
 
     await message.answer(
         f"<tg-emoji emoji-id='5231200819986047254'>📊</tg-emoji> Всего регистраций: <code>{registrations_count}</code>\n\n"
-        f"<tg-emoji emoji-id='5415965335192883624'>⚔️</tg-emoji> Придут на открытие: <code>{registrations_going_to_open_count}</code> "
-        f"(не пойдут <code>{registrations_not_going_to_open_count}</code>)\n\n"
         f"<tg-emoji emoji-id='5229011542011299168'>👑</tg-emoji> <b>Регистраций с выбранной дисциплиной:</b> <code>{registration_with_disciplines_count}</code>\n"
         f"<tg-emoji emoji-id='5431628883352895287'>🎮</tg-emoji> CS2 — <code>{registrations_cs2_count}</code>\n"
         f"<tg-emoji emoji-id='5404333301034927124'>🎮</tg-emoji> DOTA 2 — <code>{registrations_dota2_count}</code>\n"
